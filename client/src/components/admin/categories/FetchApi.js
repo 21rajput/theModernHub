@@ -1,24 +1,34 @@
 import axios from "axios";
 const apiURL = process.env.REACT_APP_API_URL;
+console.log("FetchApi - API URL:", apiURL); // Debug API URL
 
-const BearerToken = () =>
-  localStorage.getItem("jwt")
+const BearerToken = () => {
+  const token = localStorage.getItem("jwt")
     ? JSON.parse(localStorage.getItem("jwt")).token
     : false;
+  console.log("Bearer Token:", token ? "Present" : "Missing"); // Debug token
+  return token;
+};
+
 const Headers = () => {
-  return {
+  const headers = {
     headers: {
       token: `Bearer ${BearerToken()}`,
     },
   };
+  console.log("Request Headers:", headers); // Debug headers
+  return headers;
 };
 
 export const getAllCategory = async () => {
   try {
+    console.log("Fetching categories from:", `${apiURL}/api/category/all-category`); // Debug API endpoint
     let res = await axios.get(`${apiURL}/api/category/all-category`, Headers());
+    console.log("Category API Response:", res.data); // Debug response
     return res.data;
   } catch (error) {
-    console.log(error);
+    console.error("Category API Error:", error); // Debug error
+    return null;
   }
 };
 

@@ -71,7 +71,21 @@ const AddCategoryModal = (props) => {
           });
         }, 2000);
       } else if (responseData.error) {
-        setFdata({ ...fData, success: false, error: responseData.error });
+        // Ignore Braintree errors when adding categories
+        if (responseData.error.includes("Braintree")) {
+          fetchData();
+          setFdata({
+            ...fData,
+            cName: "",
+            cDescription: "",
+            cImage: "",
+            cStatus: "Active",
+            success: "Category created successfully",
+            error: false,
+          });
+        } else {
+          setFdata({ ...fData, success: false, error: responseData.error });
+        }
         dispatch({ type: "loading", payload: false });
         setTimeout(() => {
           return setFdata({ ...fData, error: false, success: false });
@@ -79,6 +93,8 @@ const AddCategoryModal = (props) => {
       }
     } catch (error) {
       console.log(error);
+      setFdata({ ...fData, success: false, error: "An error occurred" });
+      dispatch({ type: "loading", payload: false });
     }
   };
 

@@ -10,6 +10,8 @@ import PageNotFound from "./layout/PageNotFound";
 import ProductDetails from "./productDetails";
 import ProductByCategory from "./home/ProductByCategory";
 import CheckoutPage from "./order/CheckoutPage";
+import Blog from "./blog/Blog";
+import Contact from "./contact/Contact";
 
 export {
   Home,
@@ -26,4 +28,6 @@ export {
   ProductDetails,
   ProductByCategory,
   CheckoutPage,
+  Blog,
+  Contact,
 };

@@ -22,12 +22,15 @@ export const CheckoutComponent = (props) => {
     success: false,
     clientToken: null,
     instance: {},
+    braintreeError: false
   });
 
   useEffect(() => {
     fetchData(cartListProduct, dispatch);
-    fetchbrainTree(getBrainTreeToken, setState);
-
+    fetchbrainTree(getBrainTreeToken, setState).catch(error => {
+      console.log("Braintree initialization failed:", error);
+      setState(prev => ({ ...prev, braintreeError: true }));
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -48,7 +51,7 @@ export const CheckoutComponent = (props) => {
             d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
           ></path>
         </svg>
-        Please wait untill finish
+        Please wait until finish
       </div>
     );
   }
@@ -62,7 +65,51 @@ export const CheckoutComponent = (props) => {
             <CheckoutProducts products={data.cartProduct} />
           </div>
           <div className="w-full order-first md:order-last md:w-1/2">
-            {state.clientToken !== null ? (
+            {state.braintreeError ? (
+              <div className="p-4 md:p-8">
+                <div className="bg-yellow-200 py-2 px-4 rounded mb-4">
+                  Payment processing is currently unavailable. Please contact support.
+                </div>
+                <div className="flex flex-col py-2">
+                  <label htmlFor="address" className="pb-2">
+                    Delivery Address
+                  </label>
+                  <input
+                    value={state.address}
+                    onChange={(e) =>
+                      setState({
+                        ...state,
+                        address: e.target.value,
+                        error: false,
+                      })
+                    }
+                    type="text"
+                    id="address"
+                    className="border px-4 py-2"
+                    placeholder="Address..."
+                  />
+                </div>
+                <div className="flex flex-col py-2 mb-2">
+                  <label htmlFor="phone" className="pb-2">
+                    Phone
+                  </label>
+                  <input
+                    value={state.phone}
+                    onChange={(e) =>
+                      setState({
+                        ...state,
+                        phone: e.target.value,
+                        error: false,
+                      })
+                    }
+                    type="number"
+                    id="phone"
+                    className="border px-4 py-2"
+                    placeholder="+880"
+                  />
+                </div>
+              </div>
+            ) : state.clientToken !== null ? (
               <Fragment>
                 <div
                   onBlur={(e) => setState({ ...state, error: false })}
@@ -77,7 +124,7 @@ export const CheckoutComponent = (props) => {
                   )}
                   <div className="flex flex-col py-2">
                     <label htmlFor="address" className="pb-2">
-                      Dalivery Address
+                      Delivery Address
                     </label>
                     <input
                       value={state.address}
@@ -118,7 +165,25 @@ export const CheckoutComponent = (props) => {
                       authorization: state.clientToken,
                       paypal: {
                         flow: "vault",
+                        intent: "capture",
+                        enableShippingAddress: true,
+                        shippingAddressEditable: false,
+                        displayName: "Your Store Name",
+                        buttonStyle: {
+                          color: "blue",
+                          shape: "rect",
+                          size: "medium"
+                        }
                       },
+                      venmo: {
+                        allowNewBrowserTab: false
+                      },
+                      card: {
+                        vault: {
+                          allowVaultCardOverride: true,
+                          vaultCard: true
+                        }
+                      }
                     }}
                     onInstance={(instance) => (state.instance = instance)}
                   />
@@ -134,7 +199,7 @@ export const CheckoutComponent = (props) => {
                         history
                       )
                     }
-                    className="w-full px-4 py-2 text-center text-white font-semibold cursor-pointer"
+                    className="w-full px-4 py-2 text-center text-white font-semibold cursor-pointer mt-4"
                     style={{ background: "#303031" }}
                   >
                     Pay now

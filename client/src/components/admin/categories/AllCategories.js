@@ -4,12 +4,16 @@ import { CategoryContext } from "./index";
 import moment from "moment";
 
 const apiURL = process.env.REACT_APP_API_URL;
+console.log("API URL:", apiURL); // Debug API URL
 
 const AllCategory = (props) => {
   const { data, dispatch } = useContext(CategoryContext);
   const { categories, loading } = data;
+  console.log("Current categories state:", categories); // Debug categories state
+  console.log("Loading state:", loading); // Debug loading state
 
   useEffect(() => {
+    console.log("Fetching categories..."); // Debug fetch start
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -17,6 +21,7 @@ const AllCategory = (props) => {
   const fetchData = async () => {
     dispatch({ type: "loading", payload: true });
     let responseData = await getAllCategory();
+    console.log("API Response:", responseData); // Debug API response
     setTimeout(() => {
       if (responseData && responseData.Categories) {
         dispatch({

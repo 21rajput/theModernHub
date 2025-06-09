@@ -9,6 +9,8 @@ import {
   ProductDetails,
   ProductByCategory,
   CheckoutPage,
+  Blog,
+  Contact,
 } from "./shop";
 import { DashboardAdmin, Categories, Products, Orders } from "./admin";
 import { UserProfile, UserOrders, SettingUser } from "./shop/dashboardUser";
@@ -34,6 +36,8 @@ const Routes = (props) => {
           path="/checkout"
           component={CheckoutPage}
         />
+        <Route exact path="/blog" component={Blog} />
+        <Route exact path="/contact-us" component={Contact} />
         {/* Shop & Public Routes End */}
 
         {/* Admin Routes */}

@@ -1,7 +1,10 @@
 import React, { Fragment, useState } from "react";
 import { signupReq } from "./fetchApi";
 import { useSnackbar } from 'notistack';
+import { useHistory } from 'react-router-dom';
+
 const Signup = (props) => {
+  const history = useHistory();
   const [data, setData] = useState({
     name: "",
     email: "",
@@ -16,11 +19,13 @@ const Signup = (props) => {
     <div className={`text-sm text-${type}-500`}>{msg}</div>
   );
   const { enqueueSnackbar } = useSnackbar();
+  
   const formSubmit = async () => {
     setData({ ...data, loading: true });
     if (data.cPassword !== data.password) {
       return setData({
         ...data,
+        loading: false,
         error: {
           cPassword: "Password doesn't match",
           password: "Password doesn't match",
@@ -34,6 +39,8 @@ const Signup = (props) => {
         password: data.password,
         cPassword: data.cPassword,
       });
+      console.log("Signup response:", responseData); // Debug log
+      
       if (responseData.error) {
         setData({
           ...data,
@@ -51,11 +58,21 @@ const Signup = (props) => {
           cPassword: "",
           loading: false,
           error: false,
-        })
-        enqueueSnackbar('Account Created Successfully..!', { variant: 'success' })
+        });
+        enqueueSnackbar('Account Created Successfully..!', { variant: 'success' });
+        
+        // Redirect to home page after successful signup
+        setTimeout(() => {
+          history.push('/login');
+        }, 1000);
       }
     } catch (error) {
-      console.log(error);
+      console.error("Signup error:", error);
+      setData({
+        ...data,
+        loading: false,
+        error: "An error occurred during signup"
+      });
     }
   };
 
@@ -83,6 +100,7 @@ const Signup = (props) => {
             className={`${
               data.error.name ? "border-red-500" : ""
             } px-4 py-2 focus:outline-none border`}
+            disabled={data.loading}
           />
           {!data.error ? "" : alert(data.error.name, "red")}
         </div>
@@ -105,6 +123,7 @@ const Signup = (props) => {
             className={`${
               data.error.email ? "border-red-500" : ""
             } px-4 py-2 focus:outline-none border`}
+            disabled={data.loading}
           />
           {!data.error ? "" : alert(data.error.email, "red")}
         </div>
@@ -127,6 +146,7 @@ const Signup = (props) => {
             className={`${
               data.error.password ? "border-red-500" : ""
             } px-4 py-2 focus:outline-none border`}
+            disabled={data.loading}
           />
           {!data.error ? "" : alert(data.error.password, "red")}
         </div>
@@ -150,6 +170,7 @@ const Signup = (props) => {
             className={`${
               data.error.cPassword ? "border-red-500" : ""
             } px-4 py-2 focus:outline-none border`}
+            disabled={data.loading}
           />
           {!data.error ? "" : alert(data.error.cPassword, "red")}
         </div>
@@ -159,6 +180,7 @@ const Signup = (props) => {
               type="checkbox"
               id="rememberMe"
               className="px-4 py-2 focus:outline-none border mr-1"
+              disabled={data.loading}
             />
             <label htmlFor="rememberMe">
               Remember me<span className="text-sm text-gray-600">*</span>
@@ -169,11 +191,11 @@ const Signup = (props) => {
           </a>
         </div>
         <div
-          onClick={(e) => formSubmit()}
+          onClick={(e) => !data.loading && formSubmit()}
           style={{ background: "#303031" }}
-          className="px-4 py-2 text-white text-center cursor-pointer font-medium"
+          className={`px-4 py-2 text-white text-center cursor-pointer font-medium ${data.loading ? 'opacity-50 cursor-not-allowed' : ''}`}
         >
-          Create an account
+          {data.loading ? 'Creating account...' : 'Create an account'}
         </div>
       </form>
     </Fragment>

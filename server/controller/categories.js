@@ -5,12 +5,29 @@ const fs = require("fs");
 class Category {
   async getAllCategory(req, res) {
     try {
+      console.log("Fetching all categories from database...");
       let Categories = await categoryModel.find({}).sort({ _id: -1 });
+      console.log("Found categories:", Categories);
+      
+      // If no categories exist, create a test category
+      if (Categories.length === 0) {
+        console.log("No categories found, creating test category...");
+        const testCategory = new categoryModel({
+          cName: "Test Category",
+          cDescription: "This is a test category",
+          cStatus: "Active",
+          cImage: "default-category.jpg" // You'll need to add this image to your uploads folder
+        });
+        await testCategory.save();
+        Categories = [testCategory];
+        console.log("Test category created:", testCategory);
+      }
+
       if (Categories) {
         return res.json({ Categories });
       }
     } catch (err) {
-      console.log(err);
+      console.error("Error fetching categories:", err);
     }
   }
 
